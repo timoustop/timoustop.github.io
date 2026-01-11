@@ -1,0 +1,795 @@
+
+<!DOCTYPE html><html lang="zh_cn">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0" theme-name="Stellar" theme-version="1.28.0">
+  
+  <meta name="generator" content="Hexo 8.1.1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f9fafb">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  
+  <title>Nginx安装及配置详解 - Timous</title>
+
+  
+    <meta name="description" content="Nginx安装及配置详解Nginx内容介绍1.基本概念  nginx是什么，做什么事情 反向代理 负载均衡 动静分离  2.nginx安装和常用命令和配置文件  在linux系统中安装nginx nginx常用命令 nginx配置文件  3.nginx的配置实例  反向代理  4.nginx的配置实例  负载均衡  5.nginx配置实例  动静分离  6.nginx配置高可用的集群 7.ngin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx安装及配置详解">
+<meta property="og:url" content="http://example.com/2021/04/13/Nginx%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Timous">
+<meta property="og:description" content="Nginx安装及配置详解Nginx内容介绍1.基本概念  nginx是什么，做什么事情 反向代理 负载均衡 动静分离  2.nginx安装和常用命令和配置文件  在linux系统中安装nginx nginx常用命令 nginx配置文件  3.nginx的配置实例  反向代理  4.nginx的配置实例  负载均衡  5.nginx配置实例  动静分离  6.nginx配置高可用的集群 7.ngin">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040153.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040987.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040742.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040848.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040085.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040844.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041238.png">
+<meta property="og:image" content="https://gitee.com/timoustop/picture/raw/master/img/image-20201220155945517.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041008.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041643.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041842.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041360.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041604.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041467.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041273.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041582.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041731.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041708.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041937.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041194.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041579.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041225.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041303.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041958.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042480.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042968.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042299.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042756.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042967.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042034.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042431.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042175.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042706.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042754.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042956.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042370.png">
+<meta property="og:image" content="https://gitee.com/timoustop/picture/raw/master/img/image-20210430110806694.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042800.png">
+<meta property="article:published_time" content="2021-04-13T13:11:25.000Z">
+<meta property="article:modified_time" content="2026-01-11T12:43:04.289Z">
+<meta property="article:author" content="timous">
+<meta property="article:tag" content="服务">
+<meta property="article:tag" content="运维">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040153.png">
+  
+  
+  
+  <meta name="keywords" content="运维,服务">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.28.0">
+
+  
+
+  
+
+  
+</head>
+<body>
+
+<div class="l_body s:aa content tech" id="start" layout="post" ><aside class="l_left"><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601111717625.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main" ff="title">Timous</div></a></div></header>
+
+<div class="nav-area">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站內搜索"></form><div id="search-result"></div><div class="search-no-result">沒有找到內容！</div></div>
+
+
+<nav class="menu dis-select"></nav>
+</div>
+<div class="widgets">
+
+
+<widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2022/01/02/redis%E5%88%9D%E6%AD%A5%E5%AD%A6%E4%B9%A0/"><span class="title">redis初步学习</span></a><a class="item title" href="/2021/04/13/Nginx%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/"><span class="title">Nginx安装及配置详解</span></a><a class="item title" href="/2022/01/01/mysql%E5%AD%A6%E4%B9%A0/"><span class="title">mysql学习</span></a><a class="item title" href="/2022/01/06/mybatisplus%E5%AD%A6%E4%B9%A0/"><span class="title">mybatisplus学习</span></a><a class="item title" href="/2021/05/10/mp%E9%80%BB%E8%BE%91%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE/"><span class="title">mp逻辑删除数据</span></a><a class="item title" href="/2021/04/01/Lock%E4%B9%8B8%E9%94%81%E8%AF%A6%E8%A7%A3/"><span class="title">Lock之8锁详解</span></a><a class="item title" href="/2022/01/03/shadingJDBC/"><span class="title">shadingJDBC</span></a><a class="item title" href="/2022/01/14/linux%E5%AE%89%E8%A3%85mysql8/"><span class="title">linux安装mysql8</span></a><a class="item title" href="/2022/01/12/leetcode%E7%AC%94%E8%AF%95%E9%A2%98/"><span class="title">leetcode笔试题</span></a><a class="item title" href="/2022/01/10/jvm%E5%AD%A6%E4%B9%A0/"><span class="title">jvm学习</span></a></div></widget>
+</div>
+
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">首頁</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">網誌</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">發布於：<time datetime="2021-04-13T13:11:25.000Z">2021-04-13</time></span><span class="sep updated"></span><span class="text updated">更新於：<time datetime="2026-01-11T12:43:04.289Z">2026-01-11</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>Nginx安装及配置详解</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><h1 id="Nginx安装及配置详解"><a href="#Nginx安装及配置详解" class="headerlink" title="Nginx安装及配置详解"></a>Nginx安装及配置详解</h1><h1 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h1><h2 id="内容介绍"><a href="#内容介绍" class="headerlink" title="内容介绍"></a>内容介绍</h2><p>1.基本概念</p>
+<ul>
+<li>nginx是什么，做什么事情</li>
+<li>反向代理</li>
+<li>负载均衡</li>
+<li>动静分离</li>
+</ul>
+<p>2.nginx安装和常用命令和配置文件</p>
+<ul>
+<li>在linux系统中安装nginx</li>
+<li>nginx常用命令</li>
+<li>nginx配置文件</li>
+</ul>
+<p>3.nginx的配置实例</p>
+<ul>
+<li>反向代理</li>
+</ul>
+<p>4.nginx的配置实例</p>
+<ul>
+<li>负载均衡</li>
+</ul>
+<p>5.nginx配置实例</p>
+<ul>
+<li>动静分离</li>
+</ul>
+<p>6.nginx配置高可用的集群</p>
+<p>7.nginx原理</p>
+<h2 id="Nginx简介"><a href="#Nginx简介" class="headerlink" title="Nginx简介"></a>Nginx简介</h2><p>什么是nginx ， 占有内存少，并发能力强</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040153.png" alt="image-20201220150020353"></p>
+<h2 id="Nginx作为web服务器"><a href="#Nginx作为web服务器" class="headerlink" title="Nginx作为web服务器"></a>Nginx作为web服务器</h2><p>Nginx可以作为静态页面的web服务器 ， 同时还支持CGI协议的动态语言 ， 比如 perl 、 php等。但是不支持java。java程序只能通过与tomcat配合完成 。Nginx专门为性能优化而开发 ， 性能是其重要考量 ， 实现上非常注重效率 ， 能经受高负载的考验，有报告表名支持高达50000个并发连接数。</p>
+<p><a target="_blank" rel="noopener" href="https://lnmp.org/nginx.html">https://lnmp.org/nginx.html</a></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040987.png" alt="image-20201220150557422"></p>
+<h2 id="反向代理"><a href="#反向代理" class="headerlink" title="反向代理"></a>反向代理</h2><p>正向代理： Nginx不仅可以做反向代理 ， 实现负载均衡，还能用作正向代理来进行上网等功能。正向代理：如果把局域网外的internent想象成一个巨大的资源库 ， 则局域网中的客户端要访问internent，则需要通过代理服务器进行访问，这种代理服务成为正向代理。</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040742.png" alt="image-20201220151243071"></p>
+<p>反向代理：其实客户端对代理是无感知的，因为客户端不需要任何配置就能访问，我们只需要将请求发送到发现代理服务器，由反向代理服务器去选择目标服务器获取数据之后，在返回给客户端，此时反向代理服务器和目标服务器对外就是一个服务器暴露的是代理服务器地址，隐藏的是真实服务器ip地址</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040848.png" alt="image-20201220151957563"></p>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>客户端发送多个请求到服务器，服务器处理请求 ， 有一些可能要与数据库进行交互 ， 服务器处理完毕之后，在将结果返回给客户端。</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040085.png" alt="image-20201220152217805"></p>
+<p>这种结构模式对于早期的系统相对单一，并发请求相对较少的情况下是比较合适的，成本以比较低。但是伴随着信息数量的不断增长，访问量和数据的飞速增长，以及系统业务的复杂度的增加，这种架构会造成服务器响应给客户端的请求日益缓慢，&#x3D;&#x3D;<strong>并发量</strong>&#x3D;&#x3D;特别大的时候，还容易造成服务器直接崩溃。很明显，这是由于服务器性能的瓶颈造成的问题，那么如何解决这种情况呢？</p>
+<p>我们首先想到的可能是升级服务器的配置，比如提高cpu执行效率，加大内存等提高机器的物理性能来解决此问题，但是我们知道摩尔定律的日益失效问题，硬件的性能提升已经不能满足日益增长的需求了。最明显的一个例子，天猫双十一当天，某个热销商品的瞬时访问量是及其庞大的，那么类似上面的系统架构，将机器都增加到现有的顶级物理配置，都不能够满足需求，该怎么办？</p>
+<p><strong>上面的分析我们去掉了增加服务器物理配置来解决问题的办法，也就是说纵向解决问题的办法行不通了，那么横向增加服务器 的数量，然后将请求分发到各个服务器上，将原先的请求先集中到单个服务器上的情况改为将请求发送到多个服务器上，将负载分发到不同的服务器，也就是我们所说的负载均衡</strong> ， 一般的项目都实现负载均衡</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112040844.png" alt="image-20201220153902498"></p>
+<h2 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h2><p>为了加快网站的解析速度，可以把静态页面和动页面由不同的服务器来进行解析，加快解析的速度，降低原来单个服务器的压力。</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041238.png" alt="image-20201220154440225"></p>
+<h2 id="Nginx在linux系统的安装"><a href="#Nginx在linux系统的安装" class="headerlink" title="Nginx在linux系统的安装"></a>Nginx在linux系统的安装</h2><p>1.使用远程连接工具连接</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://gitee.com/timoustop/picture/raw/master/img/image-20201220155945517.png" alt="image-20201220155945517"></p>
+<p>2.安装相关的依赖</p>
+<p>安装pcre</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 解压文件</span></span><br><span class="line">tar -xvf pcre-8.00.tar.gz</span><br><span class="line"><span class="comment"># 编译检查文件</span></span><br><span class="line"><span class="built_in">cd</span> pcre-8.00</span><br><span class="line">./configure</span><br><span class="line"><span class="comment"># 安装</span></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"><span class="comment"># 查看安装pcre版本</span></span><br><span class="line">pcre-config --version</span><br></pre></td></tr></table></figure>
+
+
+
+<p>下载地址：<a target="_blank" rel="noopener" href="https://ftp.pcre.org/pub/pcre/">https://ftp.pcre.org/pub/pcre/</a></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041008.png" alt="image-20201220160721695"></p>
+<p>解压文件</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041643.png" alt="image-20201220160800383"></p>
+<p>安装openssl  zlib等其他依赖</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install make zlib zlib-devel gcc-c++ libtool openssl openssl-devel</span><br></pre></td></tr></table></figure>
+
+<p>安装nginx</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 解压文件</span></span><br><span class="line">tar -xvf nginx-1.18.0.tar.gz</span><br><span class="line"><span class="comment"># 编译检查文件</span></span><br><span class="line"><span class="built_in">cd</span> nginx-1.18.0</span><br><span class="line">./configure</span><br><span class="line"><span class="comment"># 安装</span></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"><span class="comment"># 安装成功</span></span><br><span class="line">/usr/local/nginx/sbin/nginx里面由启动的脚本</span><br><span class="line"><span class="comment"># 启动nginx</span></span><br><span class="line">./nginx </span><br><span class="line"><span class="comment"># 查看nginx是否启动</span></span><br><span class="line"> ps -ef | grep nginx</span><br><span class="line"> <span class="comment"># 访问nginx</span></span><br><span class="line"> <span class="comment"># 在默认的8080端口的话可能会冲突 ， 导致访问不到</span></span><br><span class="line"> http://47.98.196.115:9090/</span><br></pre></td></tr></table></figure>
+
+<p>如此一来，访问就成功了 ， 页面如下显示 ， 此处还要有防火墙的开放才能够正确进行访问</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041842.png" alt="image-20201220164511054"></p>
+<h2 id="nginx操作常用的命令"><a href="#nginx操作常用的命令" class="headerlink" title="nginx操作常用的命令"></a>nginx操作常用的命令</h2><p>使用操作命令的条件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入下面的目录才能够进行命令</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/nginx/sbin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看版本号</span></span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# ./nginx -v</span><br><span class="line">nginx version: nginx/1.18.0</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动nginx</span></span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# ./nginx</span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# ps -ef | grep nginx</span><br><span class="line">root     13302     1  0 16:55 ?        00:00:00 nginx: master process ./nginx</span><br><span class="line">nobody   13303 13302  0 16:55 ?        00:00:00 nginx: worker process</span><br><span class="line">root     13305  6888  0 16:55 pts/0    00:00:00 grep --color=auto nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止nginx  要先执行下面的命令，才能够进行停止</span></span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# /usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf</span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# nginx -s stop</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看状态 </span></span><br><span class="line">[root@izbp1hd0mjbeiengcpnjctz sbin]# ps -ef | grep nginx</span><br><span class="line">root     13299  6888  0 16:54 pts/0    00:00:00 grep --color=auto nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重加载  修改配置文件之后重新加载生效</span></span><br><span class="line">./nginx -s reload</span><br></pre></td></tr></table></figure>
+
+<h2 id="nginx配置文件"><a href="#nginx配置文件" class="headerlink" title="nginx配置文件"></a>nginx配置文件</h2><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041360.png" alt="image-20201220165750867"></p>
+<h3 id="nginx的配置文件有三部分组成"><a href="#nginx的配置文件有三部分组成" class="headerlink" title="nginx的配置文件有三部分组成"></a>nginx的配置文件有三部分组成</h3><h4 id="1-全局块"><a href="#1-全局块" class="headerlink" title="1.全局块"></a>1.全局块</h4><p>从配置文件开始到events块之间的内容，只要会设置一些影响nginx服务器整体运行的配置指令，主要包括配置运行Nginx服务器的用户（组） ， 允许生成的worker process数 ， 进程的PID存放路径 ， 日志存路径和类型以及配置文件的引入等</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user  nobody;</span></span><br><span class="line"><span class="comment"># nginx处理并发的数量 ， 这个值越大，并发数能够越多</span></span><br><span class="line">worker_processes  1;   </span><br><span class="line"></span><br><span class="line"><span class="comment">#error_log  logs/error.log;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  notice;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  info;</span></span><br><span class="line"></span><br><span class="line">pid        logs/nginx.pid;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-events块"><a href="#2-events块" class="headerlink" title="2.events块"></a>2.events块</h4><p>events块主要影响Nginx服务器与用户的网络连接  ， 比如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">events &#123;</span><br><span class="line"><span class="comment"># Nginx支持的最大连接数为1024</span></span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-http块"><a href="#3-http块" class="headerlink" title="3.http块"></a>3.http块</h4><p>Nginx的配置最频繁的块 ， 代理、缓存、和日志定义等绝大多数功能和第三方模块的配置都在这里。</p>
+<p>需要注意： http块也可以包括http全局块盒server块等</p>
+<p>1.http全局块</p>
+<p>http全局块配置的指令包括文件引入，MIME-TYPE定义，日志定义、连接超时时间、单链接请求数上限等</p>
+<p>2.server块</p>
+<p>这块和虚拟主机有密切关系，虚拟主机从用户角度看，和一台独立的硬件主机是完全一样的，该技术的产生是为了节省互联网服务器硬件成本。</p>
+<p>每个http块可以包含多个server块，而每个server块都相当于一个虚拟主机</p>
+<p>而每个server块也分为全局server块，以及包含多个的location块</p>
+<ul>
+<li>全局server块</li>
+</ul>
+<p>最常见的配置是虚拟主机的监听配置和本虚拟主机的名称或IP配置</p>
+<ul>
+<li><p>location</p>
+<p>一个server块可以配置多个location块</p>
+<p>这块的主要作用是基于Nginx服务器接收到的请求字符串（例如server_name&#x2F;uri_string),对虚拟主机名称（也可以是ip别名）之外的字符串（例如前面的&#x2F;uri_string）进行匹配，对特定的请求进行处理 ， 地址定向、数据缓存和应答控制等功能，还有许多第三方模块的配置也在这里进行。</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#access_log  logs/access.log  main;</span></span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">    <span class="comment"># nginx监听的端口号</span></span><br><span class="line">        listen       9090;</span><br><span class="line">    <span class="comment"># nginx监听的主机名称  这里是本地的localhostr</span></span><br><span class="line">        server_name  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line">        </span><br><span class="line">    <span class="comment"># / 请求的路径</span></span><br><span class="line">        location / &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        error_page   500 502 503 504  /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    proxy_pass   http://127.0.0.1;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span></span><br><span class="line">        <span class="comment">#  正则 表达式  有不同的实例</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    root           html;</span></span><br><span class="line">        <span class="comment">#    fastcgi_pass   127.0.0.1:9000;</span></span><br><span class="line">        <span class="comment">#    fastcgi_index  index.php;</span></span><br><span class="line">        <span class="comment">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span></span><br><span class="line">        <span class="comment">#    include        fastcgi_params;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># deny access to .htaccess files, if Apache&#x27;s document root</span></span><br><span class="line">        <span class="comment"># concurs with nginx&#x27;s one</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ /\.ht &#123;</span></span><br><span class="line">        <span class="comment">#    deny  all;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># another virtual host using mix of IP-, name-, and port-based configuration</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       8000;</span></span><br><span class="line">    <span class="comment">#    listen       somename:8080;</span></span><br><span class="line">    <span class="comment">#    server_name  somename  alias  another.alias;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTPS server</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       443 ssl;</span></span><br><span class="line">    <span class="comment">#    server_name  localhost;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_certificate      cert.pem;</span></span><br><span class="line">    <span class="comment">#    ssl_certificate_key  cert.key;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_session_cache    shared:SSL:1m;</span></span><br><span class="line">    <span class="comment">#    ssl_session_timeout  5m;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_ciphers  HIGH:!aNULL:!MD5;</span></span><br><span class="line">    <span class="comment">#    ssl_prefer_server_ciphers  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx配置实例-反向代理"><a href="#Nginx配置实例-反向代理" class="headerlink" title="Nginx配置实例  反向代理"></a>Nginx配置实例  反向代理</h2><p>1.打开浏览器   <a target="_blank" rel="noopener" href="http://www.123.com,页面显示tomcat主页面之中/">www.123.com,页面显示tomcat主页面之中</a></p>
+<p>2.具体实现</p>
+<ul>
+<li>安装tomcat ， 默认端口为8080</li>
+<li>对外开放访问的端口</li>
+<li>查看已经开放的端口</li>
+</ul>
+<p>3.window通过浏览器访问</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041604.png" alt="image-20201220201857051"></p>
+<p>4.配置反向代理</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041467.png" alt="image-20201220201808186"></p>
+<p>配置代理</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041273.png" alt="image-20201220222610223"></p>
+<p>5.重启nginx测试</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041582.png" alt="image-20201220202547826"></p>
+<p>经过测试，反向代理成功！！！</p>
+<h2 id="Nginx配置实例-，-反向代理实例"><a href="#Nginx配置实例-，-反向代理实例" class="headerlink" title="Nginx配置实例 ， 反向代理实例"></a>Nginx配置实例 ， 反向代理实例</h2><h3 id="实现效果："><a href="#实现效果：" class="headerlink" title="实现效果："></a>实现效果：</h3><p>1.使用nginx反向代理，根据访问路径跳转到不同端口中的服务中 ， nginx监听端口为9090</p>
+<p>访问http:127.0.0.1:9090&#x2F;edu&#x2F; 直接跳转到127.0.0.1：8080</p>
+<p>访问http:127.0.0.1:9090&#x2F;edu&#x2F; 直接跳转到127.0.0.1：80</p>
+<p>2.准备2个tomcat服务器 ， 一个8080 ， 一个80</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新配置的实例</span></span><br><span class="line">   <span class="comment"># 使用nginx反向代理，根据访问路径跳转到不同端口中的服务中 ， nginx监听端口为9090</span></span><br><span class="line">   <span class="comment">#</span></span><br><span class="line">   <span class="comment"># 访问http:127.0.0.1:9090/edu/ 直接跳转到127.0.0.1：8080</span></span><br><span class="line">   <span class="comment">#</span></span><br><span class="line">   <span class="comment"># 访问http:127.0.0.1:9090/edu/ 直接跳转到127.0.0.1：80</span></span><br><span class="line">   <span class="comment">#</span></span><br><span class="line">   <span class="comment"># 2.准备2个tomcat服务器 ， 一个8080 ， 一个80</span></span><br><span class="line">   server&#123;</span><br><span class="line">       listen           9001;</span><br><span class="line">       server_name      47.105.129.77;</span><br><span class="line"></span><br><span class="line">       location ~ /edu/ &#123;</span><br><span class="line">           proxy_pass   http://127.0.0.1:8080;</span><br><span class="line">       &#125;</span><br><span class="line">       location ~ /vod/ &#123;</span><br><span class="line">           proxy_pass   http://127.0.0.1:8081;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041731.png" alt="image-20201220223325558"></p>
+<p>创建测试文件：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041708.png" alt="image-20201220225650178"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041937.png" alt="image-20201220225722611"></p>
+<p>测试：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041194.png" alt="image-20201220225739739"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041579.png" alt="image-20201220225759347"></p>
+<h2 id="location指令说明"><a href="#location指令说明" class="headerlink" title="location指令说明"></a>location指令说明</h2><p>该指令用于匹配URL</p>
+<ul>
+<li>&#x3D;用于不含正则表达式的uri前，要求请求字符串与uri严格匹配，如果匹配成功，就停止继续向下搜索并立即处理该请求</li>
+<li>~用于表示含uri的正则表达式，并且区分大小写</li>
+<li>~*用于包含uri的正则表达式，并且不区分大小写</li>
+<li>^~用于不含正则表达式的uri前，要求Nginx服务器找到表示uri和请求字符串匹配度最高的location之后，立即使用此location处理请求，而不再使用location块中的uri和请求字符串作比较</li>
+</ul>
+<h2 id="Nginx配置实例-负载均衡"><a href="#Nginx配置实例-负载均衡" class="headerlink" title="Nginx配置实例-负载均衡"></a>Nginx配置实例-负载均衡</h2><p>增加服务器的数量，然后将请求分发到各个服务器上，将原先请求集中到单个服务器上的情况改为将请求分发到多个服务器上，将负载分发到不同的服务器，也就是我们所说的负载均衡</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过浏览器http://47.105.129.77/edu/a.html 负载均衡效果 ， 平均分担到8080和8081中去</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 准备2台tomcat服务器</span></span><br><span class="line"><span class="comment"># 在2台tomcat里面webapps 创建edu文件夹  ， 同一叫a.html</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行负载均衡的配置</span></span><br><span class="line">    <span class="comment"># 负载均衡实例配置</span></span><br><span class="line">    <span class="comment"># 通过浏览器http://47.105.129.77/edu/a.html 负载均衡效果 ， 平均分担到8080和8081中去</span></span><br><span class="line">    upstream myserver &#123;</span><br><span class="line">        server  47.105.129.77:8080;</span><br><span class="line">        server  47.105.129.77:8081;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       80;</span><br><span class="line">        server_name  47.105.129.77;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            proxy_pass  http://myserver;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041225.png" alt="image-20201221082237996"></p>
+<p>测试：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041303.png" alt="image-20201221082506580"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112041958.png" alt="image-20201221082520064"></p>
+<p>在相同的请求之下，分发到了不同的端口，也可以说是不同的服务器，之后可以通过多台服务器进行测试。</p>
+<p>随着互联网信息的爆炸性增长，负载均衡已经不再是一个很陌生的话题，顾名思义，负载均衡是将负载分摊到不同的服务单元中。即保证服务的可用性，又保证响应足够块，给用户很好的体验，快速增长的访问量和数据流量催生了各式各样的负载均衡产品，很多专业的负载均衡硬件提供了很好的功能，但是价格不菲，这使得负载均衡软件大受欢迎。nginx就是其中的一个，在linux下有nginx、lvs、haproxy等等服务可以提供负载均衡服务，而且Nginx提供了几种分配方式（策略）</p>
+<h2 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h2><ul>
+<li><p>轮询（默认的策略 ， 不做任何配置就是轮询）</p>
+<p>每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动删除</p>
+</li>
+<li><p>weight  权重</p>
+<p>weight代表权重 ， 默认为1 ， 权重越高被分配的客户端越多。  指定轮询几率weight和访问率成正比，用于后端服务器性能不同的服务器上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置</span></span><br><span class="line">upstream myserver &#123;</span><br><span class="line">    server  47.105.129.77:8080 weight = 5;</span><br><span class="line">    server  47.105.129.77:8081 weight = 10;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ip_hash</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置</span></span><br><span class="line">upstream myserver &#123;</span><br><span class="line">	ip_hash</span><br><span class="line">    server  47.105.129.77:8080;</span><br><span class="line">    server  47.105.129.77:8081;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>每个请求按访问ip的hash结果分配。这样每个访客固定访问一个后端服务器，可以解决session的问题</p>
+</li>
+<li><p>fair（第三方）</p>
+<p>按后端服务器的响应时间分配,响应时间短的优先分配</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置</span></span><br><span class="line">upstream myserver &#123;</span><br><span class="line">    server  47.105.129.77:8080;</span><br><span class="line">    server  47.105.129.77:8081;</span><br><span class="line">    fair</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="Nginx配置实例-动静分离"><a href="#Nginx配置实例-动静分离" class="headerlink" title="Nginx配置实例-动静分离"></a>Nginx配置实例-动静分离</h2><h3 id="什么是动静分离？"><a href="#什么是动静分离？" class="headerlink" title="什么是动静分离？"></a>什么是动静分离？</h3><p>目的： 提高访问的效率</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042480.png" alt="image-20201221091022645"></p>
+<p>Nginx动静分离简单说就是把动态跟静态请求分开，不能理解成单纯的把动态页面和静态页面物理分离。严格意义上说应该是把动态请求和静态请求分开，可以理解成Nginx处理静态页面，tomcat处理动态页面。动静分离从目前角度来讲大致分为两种</p>
+<p>一种是纯粹把静态文件独立成为单独的域名，放在独立的服务器上，也是目前主流推崇的方案；另一种方法就是把动态跟静态文件混合在一起发布，通过nginx来分开。</p>
+<p>通过location指定不同的后缀名实现不同的请求转发，通过expires参数设置，可以使浏览器缓存过期时间，减少与服务器之间的请求和流量。具体expires的定义： 是给一个资源设定一个过期时间，也就是说无需去服务端验证，直接通过浏览器自身确认是否过期即可，所以不会产生额外的流量，此种方法非常适合不经常变动的资源。（如果经常更新这个文件，不建议使用expires来缓存） ， ，这里设置3d ， 表示在这3d里面访问这个URL，发送的是一个请求，对比服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码304，如果有修改，则直接从服务器重新下载，返回状态码200</p>
+<p>2.准备工作</p>
+<p>（1） 在linux准备一些静态资源，用于进行访问</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042968.png" alt="image-20201221092103614"></p>
+<p>3.具体配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在nginx配置文件进行配置</span></span><br><span class="line">location /www/ &#123;</span><br><span class="line">root        /environment/data/;</span><br><span class="line">index       index.htm index.html;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">location /image/ &#123;</span><br><span class="line">root        /environment/data/;</span><br><span class="line">autoindex   on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042299.png" alt="image-20201221092621149"></p>
+<p>最终测试：</p>
+<p>浏览器中输入<a target="_blank" rel="noopener" href="http://47.105.129.77/image/git.png">http://47.105.129.77/image/git.png</a> 进行访问就可以看到我们放置的静态资源的图片</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042756.png" alt="image-20201221092836654"></p>
+<p>同样，我们在浏览器中输入<a target="_blank" rel="noopener" href="http://47.105.129.77/www/a.html%E5%90%8C%E6%A0%B7%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E5%88%B0%E6%88%91%E4%BB%AC%E7%9A%84html%E8%B5%84%E6%BA%90">http://47.105.129.77/www/a.html同样可以访问到我们的html资源</a></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042967.png" alt="image-20201221092921493"></p>
+<p>访问这个地址<a target="_blank" rel="noopener" href="http://47.105.129.77/image/%E5%87%BA%E7%8E%B0%EF%BC%8C%E5%B0%B1%E6%98%AF%E5%9B%A0%E4%B8%BAautoindex">http://47.105.129.77/image/出现，就是因为autoindex</a>   on，会显示文件夹里面有多少个内容，并且会显示出来</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042034.png" alt="image-20201221093013114"></p>
+<h2 id="Nginx配置高可用的集群"><a href="#Nginx配置高可用的集群" class="headerlink" title="Nginx配置高可用的集群"></a>Nginx配置高可用的集群</h2><p>keepalived  通过脚本检测nginx服务器是不是还活着，如果没有就会使用从服务器  ，  还有一个虚拟的ip也就是说两个是使用一个ip地址的</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042431.png" alt="image-20201221093846341"></p>
+<p>高可用：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042175.png" alt="image-20201221095553084"></p>
+<p>1.需要两台nginx服务器</p>
+<p>2.keepalived</p>
+<p>3.需要虚拟ip</p>
+<p>配置高可用的准备工作</p>
+<p>需要2台服务器  47.105.129.77    47.98.196.115</p>
+<p>在服务器上安装nginx</p>
+<p>2台服务器安装keepalived</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install keepalived -y</span><br></pre></td></tr></table></figure>
+
+<p>安装之后再etc生成keepalived.conf</p>
+<h2 id="高可用的配置（主从配置）"><a href="#高可用的配置（主从配置）" class="headerlink" title="高可用的配置（主从配置）"></a>高可用的配置（主从配置）</h2><p>修改keepalived配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">global_defs &#123;</span><br><span class="line">   notification_email &#123;</span><br><span class="line">     acassen@firewall.loc</span><br><span class="line">     failover@firewall.loc</span><br><span class="line">     sysadmin@firewall.loc</span><br><span class="line">   &#125;</span><br><span class="line">   notification_email_from Alexandre.Cassen@firewall.loc</span><br><span class="line">   smtp_server 192.168.200.1</span><br><span class="line">   smtp_connect_timeout 30</span><br><span class="line">   router_id LVS_DEVEL   <span class="comment"># 访问到主机</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 检测脚本配置</span></span><br><span class="line">vrrp script chk_http_port&#123;</span><br><span class="line">	script <span class="string">&quot;/usr/local/src/nginx_check.sh&quot;</span></span><br><span class="line">	interval  2  <span class="comment"># 检测脚本执行的间隔</span></span><br><span class="line">	weight    2</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    state MASTER  <span class="comment"># 备份服务器将MASTER改为BACKUP</span></span><br><span class="line">    interface eth0  <span class="comment"># 网卡</span></span><br><span class="line">    virtual_router_id 51</span><br><span class="line">    priority 100</span><br><span class="line">    advert_int 1</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass 1111</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.200.16 // 虚拟地址</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 脚本文件</span></span><br><span class="line"><span class="comment">#！/bin/bash</span></span><br><span class="line">A=`ps -C nginx -no-header | <span class="built_in">wc</span> -l`</span><br><span class="line"><span class="keyword">if</span>[<span class="variable">$A</span> -eq 0];<span class="keyword">then</span></span><br><span class="line">	/usr/local/nginx/sbin/nginx</span><br><span class="line">	<span class="built_in">sleep</span> 2</span><br><span class="line">	<span class="keyword">if</span>[`ps -C nginx --no-header | <span class="built_in">wc</span> -l` -eq 0];<span class="keyword">then</span></span><br><span class="line">		killall keepalived</span><br><span class="line">	<span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# <span class="built_in">ls</span></span><br><span class="line">nginx</span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# ./nginx -s stop</span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# <span class="built_in">ls</span></span><br><span class="line">nginx</span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# ./nginx </span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# systemctl start keepalived.service</span><br><span class="line">[root@iZm5e7hnl9pp144h2hvqmzZ sbin]# ps -ef | grep keepalived</span><br><span class="line">root       45533       1  0 10:54 ?        00:00:00 /usr/sbin/keepalived -D</span><br><span class="line">root       45534   45533  0 10:54 ?        00:00:00 /usr/sbin/keepalived -D</span><br><span class="line">root       45543   45441  0 10:54 pts/2    00:00:00 grep --color=auto keepalived</span><br><span class="line"><span class="comment"># 启动另外一个</span></span><br></pre></td></tr></table></figure>
+
+<p>把这两个启动起来nginx和keepalived</p>
+<p>测试：虚拟ip地址   这里配置失败了，因为虚拟的地址不知道在两台服务器中如何和写，因为这里不是局域网，所以没有办法配置应该有的集群，一开始忘记这个条件了，后面也不做配置了。记一下笔记。基本是这样配置的。</p>
+<h2 id="Nginx原理"><a href="#Nginx原理" class="headerlink" title="Nginx原理"></a>Nginx原理</h2><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042706.png" alt="image-20201221112406231"></p>
+<p>worker如何进行工作</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042754.png" alt="image-20201221112757627"></p>
+<p>.&#x2F;nginx -s reload热部署 , 如果worker有任务，就不进行争抢，其他的进行争抢</p>
+<h3 id="master——worker机制的好处："><a href="#master——worker机制的好处：" class="headerlink" title="master——worker机制的好处："></a>master——worker机制的好处：</h3><p>首先，对于每个worker进程来说，独立的进程，不需要加锁，所以省掉了锁带来的开销，同时在编程以及问题查找时，也会方便很多。其次，采用独立的进程，可以让互相之间不会影响，一个进程退出后，其他进程还在工作，服务不会中断，master进程很快会启动新的worker进程。当然，worker进程的异常退出，肯定是程序有bug了，异常退出，会导致当前worker上的所有请求失败，不过不会影响到所有的请求，所以降低了风险</p>
+<h3 id="需要设置多少个worker"><a href="#需要设置多少个worker" class="headerlink" title="需要设置多少个worker"></a>需要设置多少个worker</h3><p>Nginx同redis类似采用了io多路复用机制，每个worker都是独立的进程，但是每个进程里只有一个主线程，通过异步非阻塞的方式来处理请求，即使是上千万个请求也不在话下。每个worker的线程可以吧一个cpu的性能发挥到机制。所以worker数和服务器的cpu是相等是最为适宜的。设少了会浪费cpu，设多了会造成cpu的频繁切换上下文带来损耗</p>
+<h3 id="设置worker数量"><a href="#设置worker数量" class="headerlink" title="设置worker数量"></a>设置worker数量</h3><p>发送一个请求占用了worker的几个连接数</p>
+<p>2  或者 4个 ， 发请求和接受请求</p>
+<p>nginx中有一个master有四个worker，每个worker支持的最大连接数是1024，支持的最大并发数是多少？</p>
+<p>连接数     4*1024    并发：  2048 &#x2F; 1024</p>
+<h2 id="Nginx的详细的配置文件（内置https的）"><a href="#Nginx的详细的配置文件（内置https的）" class="headerlink" title="Nginx的详细的配置文件（内置https的）"></a>Nginx的详细的配置文件（内置https的）</h2><p>在配置的时候需要ssl安全证书（本着能白嫖绝不花钱的，这里就使用我们的免费的来进行学习）</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042956.png" alt="image-20210430110605805"></p>
+<p>下载之后的证书：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042370.png" alt="image-20210430110747036"></p>
+<p>解压之后上传到服务器</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://gitee.com/timoustop/picture/raw/master/img/image-20210430110806694.png" alt="image-20210430110806694"></p>
+<p>上传之后</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112042800.png" alt="image-20210430110832117"></p>
+<p>详细配置如下配置文件所示，但是在此之前在安装的时候要进行https模块的安装</p>
+<p>如果出现<code>the &quot;ssl&quot; parameter requires ngx_http_ssl_module</code>这个错误，需要在编译的时候：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">./configure --with-http_ssl_module</span><br><span class="line"></span><br><span class="line"><span class="comment"># 然后进行make ， 不是make &amp;&amp; make install 不然可能会进行报错</span></span><br><span class="line">make</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行重新加载</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/nginx/sbin</span><br><span class="line">./nginx -s reload</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看nginx的进程的</span></span><br><span class="line">ps -ef | grep nginx</span><br></pre></td></tr></table></figure>
+
+<h3 id="下面是详细的配置文件"><a href="#下面是详细的配置文件" class="headerlink" title="下面是详细的配置文件"></a>下面是详细的配置文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user  nobody;</span></span><br><span class="line">worker_processes  1;</span><br><span class="line"></span><br><span class="line"><span class="comment">#error_log  logs/error.log;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  notice;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  info;</span></span><br><span class="line"></span><br><span class="line">pid        logs/nginx.pid;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#access_log  logs/access.log  main;</span></span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       80;</span><br><span class="line">        server_name  timous.top;</span><br><span class="line">	<span class="comment">## 将http直接转化为https，成为加密的域名 这里的server_name就是上面所配置的域名</span></span><br><span class="line">	<span class="built_in">return</span> 301 https://$server_name<span class="variable">$request_uri</span>;   </span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        error_page   500 502 503 504  /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    proxy_pass   http://127.0.0.1;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    root           html;</span></span><br><span class="line">        <span class="comment">#    fastcgi_pass   127.0.0.1:9000;</span></span><br><span class="line">        <span class="comment">#    fastcgi_index  index.php;</span></span><br><span class="line">        <span class="comment">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span></span><br><span class="line">        <span class="comment">#    include        fastcgi_params;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># deny access to .htaccess files, if Apache&#x27;s document root</span></span><br><span class="line">        <span class="comment"># concurs with nginx&#x27;s one</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ /\.ht &#123;</span></span><br><span class="line">        <span class="comment">#    deny  all;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># another virtual host using mix of IP-, name-, and port-based configuration</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       8000;</span></span><br><span class="line">    <span class="comment">#    listen       somename:8080;</span></span><br><span class="line">    <span class="comment">#    server_name  somename  alias  another.alias;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTPS server</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       443 ssl;</span></span><br><span class="line">    <span class="comment">#    server_name  localhost;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_certificate      cert.pem;</span></span><br><span class="line">    <span class="comment">#    ssl_certificate_key  cert.key;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_session_cache    shared:SSL:1m;</span></span><br><span class="line">    <span class="comment">#    ssl_session_timeout  5m;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_ciphers  HIGH:!aNULL:!MD5;</span></span><br><span class="line">    <span class="comment">#    ssl_prefer_server_ciphers  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line">	</span><br><span class="line">	server &#123;</span><br><span class="line">		listen 443 ssl;</span><br><span class="line">		<span class="comment">#配置HTTPS的默认访问端口为443。</span></span><br><span class="line">		<span class="comment">#如果未在此处配置HTTPS的默认访问端口，可能会造成Nginx无法启动。</span></span><br><span class="line">		<span class="comment">#如果您使用Nginx 1.15.0及以上版本，请使用listen 443 ssl代替listen 443和ssl on。</span></span><br><span class="line">		server_name timous.top; <span class="comment">#需要将yourdomain.com替换成证书绑定的域名。</span></span><br><span class="line">		root html;</span><br><span class="line">		index index.html index.htm;</span><br><span class="line">		ssl_certificate /cert/5190359_timous.top.pem;  <span class="comment">#需要将cert-file-name.pem替换成已上传的证书文件的名称。</span></span><br><span class="line">		ssl_certificate_key /cert/5190359_timous.top.key; <span class="comment">#需要将cert-file-name.key替换成已上传的证书密钥文件的名称。</span></span><br><span class="line">		ssl_session_timeout 5m;</span><br><span class="line">		ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">		<span class="comment">#表示使用的加密套件的类型。</span></span><br><span class="line">		ssl_protocols TLSv1 TLSv1.1 TLSv1.2; <span class="comment">#表示使用的TLS协议的类型。</span></span><br><span class="line">		ssl_prefer_server_ciphers on;</span><br><span class="line">		location / &#123;</span><br><span class="line">			proxy_pass   http://127.0.0.1:8080;</span><br><span class="line">		&#125;</span><br><span class="line">		location /jenkins &#123;</span><br><span class="line">			proxy_pass  http://127.0.0.1:8001/test/testjenkins;</span><br><span class="line">		&#125;	</span><br><span class="line">        location ~ /edu/ &#123;</span><br><span class="line">            proxy_pass   http://127.0.0.1:8080;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="article-footer fs14">
+    <section id="license">
+      <div class="header"><span>授權條款</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    </div>
+</article>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">較新文章</div><a href="/2021/05/10/mp%E9%80%BB%E8%BE%91%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE/">mp逻辑删除数据</a></div><div class="item" id="next"><div class="note">較早文章</div><a href="/2021/04/12/Jenkins/">Jenkins</a></div></section></div>
+
+
+
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><p>本站由 <a href="/">timous</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0">Stellar 1.28.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目錄</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Nginx%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3"><span class="toc-text">Nginx安装及配置详解</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Nginx"><span class="toc-text">Nginx</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AE%B9%E4%BB%8B%E7%BB%8D"><span class="toc-text">内容介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E7%AE%80%E4%BB%8B"><span class="toc-text">Nginx简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E4%BD%9C%E4%B8%BAweb%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">Nginx作为web服务器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="toc-text">反向代理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-text">负载均衡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB"><span class="toc-text">动静分离</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E5%9C%A8linux%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%89%E8%A3%85"><span class="toc-text">Nginx在linux系统的安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nginx%E6%93%8D%E4%BD%9C%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4"><span class="toc-text">nginx操作常用的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nginx%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">nginx配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%9C%89%E4%B8%89%E9%83%A8%E5%88%86%E7%BB%84%E6%88%90"><span class="toc-text">nginx的配置文件有三部分组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%85%A8%E5%B1%80%E5%9D%97"><span class="toc-text">1.全局块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-events%E5%9D%97"><span class="toc-text">2.events块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-http%E5%9D%97"><span class="toc-text">3.http块</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B-%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="toc-text">Nginx配置实例  反向代理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B-%EF%BC%8C-%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%AE%9E%E4%BE%8B"><span class="toc-text">Nginx配置实例 ， 反向代理实例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%95%88%E6%9E%9C%EF%BC%9A"><span class="toc-text">实现效果：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#location%E6%8C%87%E4%BB%A4%E8%AF%B4%E6%98%8E"><span class="toc-text">location指令说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-text">Nginx配置实例-负载均衡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AD%96%E7%95%A5"><span class="toc-text">负载均衡策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B-%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB"><span class="toc-text">Nginx配置实例-动静分离</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB%EF%BC%9F"><span class="toc-text">什么是动静分离？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E9%85%8D%E7%BD%AE%E9%AB%98%E5%8F%AF%E7%94%A8%E7%9A%84%E9%9B%86%E7%BE%A4"><span class="toc-text">Nginx配置高可用的集群</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E7%9A%84%E9%85%8D%E7%BD%AE%EF%BC%88%E4%B8%BB%E4%BB%8E%E9%85%8D%E7%BD%AE%EF%BC%89"><span class="toc-text">高可用的配置（主从配置）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E5%8E%9F%E7%90%86"><span class="toc-text">Nginx原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#master%E2%80%94%E2%80%94worker%E6%9C%BA%E5%88%B6%E7%9A%84%E5%A5%BD%E5%A4%84%EF%BC%9A"><span class="toc-text">master——worker机制的好处：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E8%AE%BE%E7%BD%AE%E5%A4%9A%E5%B0%91%E4%B8%AAworker"><span class="toc-text">需要设置多少个worker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEworker%E6%95%B0%E9%87%8F"><span class="toc-text">设置worker数量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx%E7%9A%84%E8%AF%A6%E7%BB%86%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%88%E5%86%85%E7%BD%AEhttps%E7%9A%84%EF%BC%89"><span class="toc-text">Nginx的详细的配置文件（内置https的）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E9%9D%A2%E6%98%AF%E8%AF%A6%E7%BB%86%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">下面是详细的配置文件</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer">
+
+<a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/></g></svg><span>回到頂部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M10.46 1.25h3.08c1.603 0 2.86 0 3.864.095c1.023.098 1.861.3 2.6.752a5.75 5.75 0 0 1 1.899 1.899c.452.738.654 1.577.752 2.6c.095 1.004.095 2.261.095 3.865v1.067c0 1.141 0 2.036-.05 2.759c-.05.735-.153 1.347-.388 1.913a5.75 5.75 0 0 1-3.112 3.112c-.805.334-1.721.408-2.977.43a10.81 10.81 0 0 0-.929.036c-.198.022-.275.054-.32.08c-.047.028-.112.078-.224.232c-.121.166-.258.396-.476.764l-.542.916c-.773 1.307-2.69 1.307-3.464 0l-.542-.916a10.605 10.605 0 0 0-.476-.764c-.112-.154-.177-.204-.224-.232c-.045-.026-.122-.058-.32-.08c-.212-.023-.49-.03-.93-.037c-1.255-.021-2.171-.095-2.976-.429A5.75 5.75 0 0 1 1.688 16.2c-.235-.566-.338-1.178-.389-1.913c-.049-.723-.049-1.618-.049-2.76v-1.066c0-1.604 0-2.86.095-3.865c.098-1.023.3-1.862.752-2.6a5.75 5.75 0 0 1 1.899-1.899c.738-.452 1.577-.654 2.6-.752C7.6 1.25 8.857 1.25 10.461 1.25M6.739 2.839c-.914.087-1.495.253-1.959.537A4.25 4.25 0 0 0 3.376 4.78c-.284.464-.45 1.045-.537 1.96c-.088.924-.089 2.11-.089 3.761v1c0 1.175 0 2.019.046 2.685c.045.659.131 1.089.278 1.441a4.25 4.25 0 0 0 2.3 2.3c.515.214 1.173.294 2.429.316h.031c.398.007.747.013 1.037.045c.311.035.616.104.909.274c.29.17.5.395.682.645c.169.232.342.525.538.856l.559.944a.52.52 0 0 0 .882 0l.559-.944c.196-.331.37-.624.538-.856c.182-.25.392-.476.682-.645c.293-.17.598-.24.909-.274c.29-.032.639-.038 1.037-.045h.032c1.255-.022 1.913-.102 2.428-.316a4.25 4.25 0 0 0 2.3-2.3c.147-.352.233-.782.278-1.441c.046-.666.046-1.51.046-2.685v-1c0-1.651 0-2.837-.089-3.762c-.087-.914-.253-1.495-.537-1.959a4.25 4.25 0 0 0-1.403-1.403c-.464-.284-1.045-.45-1.96-.537c-.924-.088-2.11-.089-3.761-.089h-3c-1.651 0-2.837 0-3.762.089" clip-rule="evenodd"/><path fill="currentColor" d="M9 11a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><span>參與討論</span></a></div></widget>
+</div></aside><div class='float-panel blur'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+<script type="text/javascript">
+  const ctx = {
+    date_suffix: {
+      just: `剛剛`,
+      min: `分鐘前`,
+      hour: `小時前`,
+      day: `天前`,
+    },
+    root : `/`,
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+  };
+  const deps = {
+    jquery: `https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js`,
+    marked: `https://cdn.bootcdn.net/ajax/libs/marked/4.0.18/marked.min.js`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')){
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+    
+    onLoading: (el) => {
+      if (el) {
+        $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      let retryTimes = 3;
+      utils.onLoading(el);
+      function req() {
+        return new Promise((resolve, reject) => {
+          let status = 0; // 0 等待 1 完成 2 超时
+          let timer = setTimeout(() => {
+            if (status === 0) {
+              status = 2;
+              timer = null;
+              reject('请求超时');
+              if (retryTimes == 0) {
+                onFailure();
+              }
+            }
+          }, 5000);
+          fetch(url).then(function(response) {
+            if (status !== 2) {
+              clearTimeout(timer);
+              resolve(response);
+              timer = null;
+              status = 1;
+            }
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          }).then(function(data) {
+            retryTimes = 0;
+            utils.onLoadSuccess(el);
+            callback(data);
+          }).catch(function(error) {
+            if (retryTimes > 0) {
+              retryTimes -= 1;
+              setTimeout(() => {
+                req();
+              }, 5000);
+            } else {
+              utils.onLoadFailure(el);
+              onFailure();
+            }
+          });
+        });
+      }
+      req();
+    },
+  };
+</script>
+
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.28.0" async></script>
+
+<!-- optional -->
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.bootcdn.net/ajax/libs/flying-pages/2.1.2/flying-pages.min.js"></script><script defer src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.8.4/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+</script><script>
+  ctx.fancybox = {
+    selector: `.timenode p>img`,
+    css: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.min.css`,
+    js: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.umd.min.js`
+  };
+  var selector = '[data-fancybox]:not(.error)';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const els = document.getElementsByClassName('ds-memos');
+    if (els != undefined && els.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || null
+        }
+      });
+    })
+  }
+</script><script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>
