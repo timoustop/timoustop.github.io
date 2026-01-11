@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0" theme-name="Stellar" theme-version="1.28.0">
-  <meta name="robots" content="noindex,follow">
+  
   <meta name="generator" content="Hexo 8.1.1">
   <meta http-equiv='x-dns-prefetch-control' content='on' />
   
@@ -17,20 +17,25 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f9fafb">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   
-  <title>Tag: 面试题 - Timous</title>
+  <title>equals和异常 - Timous</title>
 
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Timous">
-<meta property="og:url" content="http://example.com/tags/%E9%9D%A2%E8%AF%95%E9%A2%98/index.html">
+    <meta name="description" content="equals和异常equals详解两个对象的值相等，但却可能有不同的hashcode，这句话对不对？两个对象x , y如果满足x.equals（y）&#x3D;&#x3D; true , 它们的哈希码（hashcode）应当相同。Java对于equals方法和hashcode是这样规定的：  如果两个对象相同（equals方法返回true），那么它们的hashcode值一定相同。 如果两个对象的h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="equals和异常">
+<meta property="og:url" content="http://example.com/2021/03/26/equals%E5%92%8C%E5%BC%82%E5%B8%B8/index.html">
 <meta property="og:site_name" content="Timous">
+<meta property="og:description" content="equals和异常equals详解两个对象的值相等，但却可能有不同的hashcode，这句话对不对？两个对象x , y如果满足x.equals（y）&#x3D;&#x3D; true , 它们的哈希码（hashcode）应当相同。Java对于equals方法和hashcode是这样规定的：  如果两个对象相同（equals方法返回true），那么它们的hashcode值一定相同。 如果两个对象的h">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-26T11:46:41.000Z">
+<meta property="article:modified_time" content="2026-01-11T12:13:50.926Z">
 <meta property="article:author" content="timous">
+<meta property="article:tag" content="面试题">
 <meta name="twitter:card" content="summary">
   
   
   
-  
+  <meta name="keywords" content="面试题">
 
   <!-- feed -->
   
@@ -45,7 +50,7 @@
 </head>
 <body>
 
-<div class="l_body s:aa index tech" id="start" layout="undefined" ><aside class="l_left"><div class="leftbar-container">
+<div class="l_body s:aa content tech" id="start" layout="post" ><aside class="l_left"><div class="leftbar-container">
 
 
 <header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601111717625.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main" ff="title">Timous</div></a></div></header>
@@ -57,40 +62,90 @@
 <nav class="menu dis-select"></nav>
 </div>
 <div class="widgets">
+
+
 <widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2021/12/27/hexo%E7%9A%84%E5%86%99%E4%BD%9C%E9%97%AE%E9%A2%98/"><span class="title">hexo的写作问题</span></a><a class="item title" href="/2022/01/14/HashMap%E6%BA%90%E7%A0%81%E6%8E%A2%E7%A9%B6/"><span class="title">HashMap源码探究</span></a><a class="item title" href="/2022/01/11/git%E5%AD%A6%E4%B9%A0/"><span class="title">git学习</span></a><a class="item title" href="/2021/03/26/equals%E5%92%8C%E5%BC%82%E5%B8%B8/"><span class="title">equals和异常</span></a><a class="item title" href="/2021/05/13/axios%E7%9A%84params%E5%92%8Cdata%E7%9A%84%E5%8C%BA%E5%88%AB/"><span class="title">axios的params和data的区别</span></a><a class="item title" href="/2021/04/06/ArrayList%E5%BA%95%E5%B1%82%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/"><span class="title">ArrayList底层源码详解</span></a><a class="item title" href="/2022/01/08/docker%E5%AD%A6%E4%B9%A0/"><span class="title">docker学习</span></a><a class="item title" href="/2026/01/11/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/"><span class="title">Hexo博客搭建</span></a></div></widget>
 </div>
 
 </div></aside><div class="l_main" id="main">
 
-<header class="header mobile-only"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601111717625.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main" ff="title">Timous</div></a></div></header>
-
- 
 
 
 
 
-<div class="navbar top"><nav class="post"><a href="/">Recent</a><a class="active" href="/tags">Tag: 面试题</a><a href="/archives">Archives</a></nav></div>
-<div class="post-list post"><a class="post-card post" href="/2021/04/06/ArrayList%E5%BA%95%E5%B1%82%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/">
-<article class="md-text"><h2 class="post-title">ArrayList底层源码详解</h2><div class="excerpt"><p>ArrayList底层源码详解ArrayList底层的数据结构List解耦的可调整大小的数组实现
-数组的特点是一旦初始化，长度就不可以发生改变，这个时候又是一个可以调整的数组
-数组特点：
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2021-03-26T11:46:41.000Z">2021-03-26</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-11T12:13:50.926Z">2026-01-11</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>equals和异常</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><h1 id="equals和异常"><a href="#equals和异常" class="headerlink" title="equals和异常"></a>equals和异常</h1><h2 id="equals详解"><a href="#equals详解" class="headerlink" title="equals详解"></a>equals详解</h2><h3 id="两个对象的值相等，但却可能有不同的hashcode，这句话对不对？"><a href="#两个对象的值相等，但却可能有不同的hashcode，这句话对不对？" class="headerlink" title="两个对象的值相等，但却可能有不同的hashcode，这句话对不对？"></a>两个对象的值相等，但却可能有不同的hashcode，这句话对不对？</h3><p>两个对象x , y如果满足x.equals（y）&#x3D;&#x3D; true , 它们的哈希码（hashcode）应当相同。Java对于equals方法和hashcode是这样规定的：</p>
+<ul>
+<li>如果两个对象相同（equals方法返回true），那么它们的hashcode值一定相同。</li>
+<li>如果两个对象的hashcode值相同，它们并不一定相同。当然，你未必按照要求去做，但是如果你违背了上述的原则就会发现使用容器的时候，相同的对象可以出现在Set集合中，同时增加新元素的效率会大大下降（对于使用哈希存储的系统，如果哈希频繁的冲突会造成存取性能几句下降）</li>
+</ul>
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><h3 id="Java异常的分类"><a href="#Java异常的分类" class="headerlink" title="Java异常的分类"></a>Java异常的分类</h3><p><strong>按照异常处理的时机分类的话有</strong></p>
+<ul>
+<li>编译时异常（强制性异常）也叫CheckedException</li>
+<li>运行时异常（非强制异常）也叫RunTimeException</li>
+</ul>
+<h3 id="异常处理-1"><a href="#异常处理-1" class="headerlink" title="异常处理"></a>异常处理</h3><ul>
+<li><p>当前方法知道如何处理该异常，则用 try…catch 块来处理该异常。</p>
+</li>
+<li><p>当前方法不知道如何处理，则在定义该方法是声明抛出该异常。</p>
+</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getNum</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">1</span>/<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-增加元素
-删除元素
-修改元素
-查找元素
+<p>测试 结果为3，代码在遇到第三行的时候遇到异常，会到<strong>catch</strong>语句中，执行第六行，但是异常机制有这么一个原则，在catch中遇到<strong>return</strong>的或者异常能够使该函数终止的话，<strong>finally</strong>就必须先执行完，所以第六行不会返回值，返回的是第八行的值。真正返回的值是3。</p>
+<h2 id="常见的RuntimeException"><a href="#常见的RuntimeException" class="headerlink" title="常见的RuntimeException"></a>常见的RuntimeException</h2><ol>
+<li>java.lang.NullPointerException空指针异常；出现原因是：调用了未经初始化的对象或者是不存在的对象</li>
+<li>java.lang.ClassNotFoundException指定的类找不到；出现原因是：类的名称和路径加载错误，通常都是程序试图通过字符串来加载某个类时所发生的异常。</li>
+<li>java.lang.NumberFormatException字符串转化为数字异常；出现原因： 字符型数据中包含非数字型字符。</li>
+<li>java.langIndexOutOfBoundsException数组角标越界异常，常见于操作数组对象是发生。</li>
+<li>java.lang.IllegalArgumentException方法传递参数错误。</li>
+<li>java.lang.ClassCastException数据类型转换异常。</li>
+<li>java.lang.NoClassDefFoundException未找到类定义错误。</li>
+<li>SQLException异常，常见于操作数据库是的SQL语句错误。</li>
+<li>java.lang.InstantiationException实例化异常</li>
+<li>java.lang.NoSuchMerthodException方法不存在异常。</li>
+</ol>
+
+<div class="article-footer fs14">
+    <section id="license">
+      <div class="header"><span>License</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    </div>
+</article>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2021/04/06/ArrayList%E5%BA%95%E5%B1%82%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/">ArrayList底层源码详解</a></div><div class="item" id="next"></div></section></div>
 
 
-数组结构介绍特点...</p></div><div class="meta cap"><span class="cap" id="post-meta"><svg style="margin-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972c.697-.67 1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828C4.343 22 6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172C22 19.658 22 17.772 22 14" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><time datetime="2021-04-06T12:08:44.000Z">2021-04-06</time></span></div></article>
-</a><a class="post-card post" href="/2021/03/26/equals%E5%92%8C%E5%BC%82%E5%B8%B8/">
-<article class="md-text"><h2 class="post-title">equals和异常</h2><div class="excerpt"><p>equals和异常equals详解两个对象的值相等，但却可能有不同的hashcode，这句话对不对？两个对象x , y如果满足x.equals（y）&#x3D;&#x3D; true , 它们的哈希码（hashcode）应当相同。Java对于equa...</p></div><div class="meta cap"><span class="cap" id="post-meta"><svg style="margin-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972c.697-.67 1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828C4.343 22 6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172C22 19.658 22 17.772 22 14" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><time datetime="2021-03-26T11:46:41.000Z">2021-03-26</time></span></div></article>
-</a></div>
+
+
 
 
 <footer class="page-footer footnote"><hr><div class="text"><p>本站由 <a href="/">timous</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0">Stellar 1.28.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
 </div></footer>
 <div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
-</aside><div class='float-panel blur'>
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#equals%E5%92%8C%E5%BC%82%E5%B8%B8"><span class="toc-text">equals和异常</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#equals%E8%AF%A6%E8%A7%A3"><span class="toc-text">equals详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%80%BC%E7%9B%B8%E7%AD%89%EF%BC%8C%E4%BD%86%E5%8D%B4%E5%8F%AF%E8%83%BD%E6%9C%89%E4%B8%8D%E5%90%8C%E7%9A%84hashcode%EF%BC%8C%E8%BF%99%E5%8F%A5%E8%AF%9D%E5%AF%B9%E4%B8%8D%E5%AF%B9%EF%BC%9F"><span class="toc-text">两个对象的值相等，但却可能有不同的hashcode，这句话对不对？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Java%E5%BC%82%E5%B8%B8%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-text">Java异常的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86-1"><span class="toc-text">异常处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-text">测试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84RuntimeException"><span class="toc-text">常见的RuntimeException</span></a></li></ol></li></ol></div><div class="widget-footer">
+
+<a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M10.46 1.25h3.08c1.603 0 2.86 0 3.864.095c1.023.098 1.861.3 2.6.752a5.75 5.75 0 0 1 1.899 1.899c.452.738.654 1.577.752 2.6c.095 1.004.095 2.261.095 3.865v1.067c0 1.141 0 2.036-.05 2.759c-.05.735-.153 1.347-.388 1.913a5.75 5.75 0 0 1-3.112 3.112c-.805.334-1.721.408-2.977.43a10.81 10.81 0 0 0-.929.036c-.198.022-.275.054-.32.08c-.047.028-.112.078-.224.232c-.121.166-.258.396-.476.764l-.542.916c-.773 1.307-2.69 1.307-3.464 0l-.542-.916a10.605 10.605 0 0 0-.476-.764c-.112-.154-.177-.204-.224-.232c-.045-.026-.122-.058-.32-.08c-.212-.023-.49-.03-.93-.037c-1.255-.021-2.171-.095-2.976-.429A5.75 5.75 0 0 1 1.688 16.2c-.235-.566-.338-1.178-.389-1.913c-.049-.723-.049-1.618-.049-2.76v-1.066c0-1.604 0-2.86.095-3.865c.098-1.023.3-1.862.752-2.6a5.75 5.75 0 0 1 1.899-1.899c.738-.452 1.577-.654 2.6-.752C7.6 1.25 8.857 1.25 10.461 1.25M6.739 2.839c-.914.087-1.495.253-1.959.537A4.25 4.25 0 0 0 3.376 4.78c-.284.464-.45 1.045-.537 1.96c-.088.924-.089 2.11-.089 3.761v1c0 1.175 0 2.019.046 2.685c.045.659.131 1.089.278 1.441a4.25 4.25 0 0 0 2.3 2.3c.515.214 1.173.294 2.429.316h.031c.398.007.747.013 1.037.045c.311.035.616.104.909.274c.29.17.5.395.682.645c.169.232.342.525.538.856l.559.944a.52.52 0 0 0 .882 0l.559-.944c.196-.331.37-.624.538-.856c.182-.25.392-.476.682-.645c.293-.17.598-.24.909-.274c.29-.032.639-.038 1.037-.045h.032c1.255-.022 1.913-.102 2.428-.316a4.25 4.25 0 0 0 2.3-2.3c.147-.352.233-.782.278-1.441c.046-.666.046-1.51.046-2.685v-1c0-1.651 0-2.837-.089-3.762c-.087-.914-.253-1.495-.537-1.959a4.25 4.25 0 0 0-1.403-1.403c-.464-.284-1.045-.45-1.96-.537c-.924-.088-2.11-.089-3.761-.089h-3c-1.651 0-2.837 0-3.762.089" clip-rule="evenodd"/><path fill="currentColor" d="M9 11a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel blur'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
   </button>
