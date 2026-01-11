@@ -1,0 +1,747 @@
+
+<!DOCTYPE html><html lang="zh_cn">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0" theme-name="Stellar" theme-version="1.28.0">
+  
+  <meta name="generator" content="Hexo 8.1.1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f9fafb">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  
+  <title>jvm学习 - Timous</title>
+
+  
+    <meta name="description" content="JVM探究 请你谈谈你对JVM的理解？  jvm8虚拟机和之前的变化  或者说更新 什么是OOM，什么是栈溢出StackOverFlowError    Exception  ？怎么分析 JVM的常用的调优参数有哪些？ 内存快照如何抓取，怎么分析Dump下来的文件？ 谈谈JVM中类加载器你的认识？？  1.JVM的位置 2.JVM的体系结构  很多的第三方插件都是在执行引擎那一块加上的，其他的基本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jvm学习">
+<meta property="og:url" content="http://example.com/2022/01/10/jvm%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Timous">
+<meta property="og:description" content="JVM探究 请你谈谈你对JVM的理解？  jvm8虚拟机和之前的变化  或者说更新 什么是OOM，什么是栈溢出StackOverFlowError    Exception  ？怎么分析 JVM的常用的调优参数有哪些？ 内存快照如何抓取，怎么分析Dump下来的文件？ 谈谈JVM中类加载器你的认识？？  1.JVM的位置 2.JVM的体系结构  很多的第三方插件都是在执行引擎那一块加上的，其他的基本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030720.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030007.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030469.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030321.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030341.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030838.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030200.png">
+<meta property="og:image" content="http://example.com/jvm%E5%AD%A6%E4%B9%A0.assets/image-20201008011215334.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030306.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030851.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030977.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030175.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030948.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030707.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030299.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030373.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030631.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031616.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031411.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031584.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031738.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031147.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031226.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031431.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031509.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031983.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031101.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031332.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031188.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031328.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031859.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031726.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112032750.png">
+<meta property="article:published_time" content="2022-01-10T05:45:52.000Z">
+<meta property="article:modified_time" content="2026-01-11T12:32:09.916Z">
+<meta property="article:author" content="timous">
+<meta property="article:tag" content="虚拟机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030720.png">
+  
+  
+  
+  <meta name="keywords" content="虚拟机">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.28.0">
+
+  
+
+  
+
+  
+</head>
+<body>
+
+<div class="l_body s:aa content tech" id="start" layout="post" ><aside class="l_left"><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601111717625.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main" ff="title">Timous</div></a></div></header>
+
+<div class="nav-area">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站內搜索"></form><div id="search-result"></div><div class="search-no-result">沒有找到內容！</div></div>
+
+
+<nav class="menu dis-select"></nav>
+</div>
+<div class="widgets">
+
+
+<widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2022/01/14/linux%E5%AE%89%E8%A3%85mysql8/"><span class="title">linux安装mysql8</span></a><a class="item title" href="/2022/01/12/leetcode%E7%AC%94%E8%AF%95%E9%A2%98/"><span class="title">leetcode笔试题</span></a><a class="item title" href="/2022/01/10/jvm%E5%AD%A6%E4%B9%A0/"><span class="title">jvm学习</span></a><a class="item title" href="/2021/03/26/JUC%E5%AD%A6%E4%B9%A0/"><span class="title">JUC学习</span></a><a class="item title" href="/2021/03/30/linux%E4%B9%8BJava%E5%9F%BA%E6%9C%AC%E7%8E%AF%E5%A2%83%E7%9A%84%E9%85%8D%E7%BD%AE/"><span class="title">linux之Java基本环境的配置</span></a><a class="item title" href="/2022/02/27/java%E9%9D%A2%E8%AF%95%E9%A2%98%E8%BF%9B%E9%98%B6/"><span class="title">java面试题进阶</span></a><a class="item title" href="/2022/02/24/Java%E9%9D%A2%E8%AF%95%E9%A2%98/"><span class="title">Java面试题</span></a><a class="item title" href="/2021/04/12/Jenkins/"><span class="title">Jenkins</span></a><a class="item title" href="/2021/03/28/Java%E7%9A%84IO%E6%B5%81/"><span class="title">Java的IO流</span></a><a class="item title" href="/2021/12/31/java%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"><span class="title">java基础知识</span></a></div></widget>
+</div>
+
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">首頁</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">網誌</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">發布於：<time datetime="2022-01-10T05:45:52.000Z">2022-01-10</time></span><span class="sep updated"></span><span class="text updated">更新於：<time datetime="2026-01-11T12:32:09.916Z">2026-01-11</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>jvm学习</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><h1 id="JVM探究"><a href="#JVM探究" class="headerlink" title="JVM探究"></a>JVM探究</h1><ul>
+<li>请你谈谈你对JVM的理解？  jvm8虚拟机和之前的变化  或者说更新</li>
+<li>什么是OOM，什么是栈溢出StackOverFlowError    Exception  ？怎么分析</li>
+<li>JVM的常用的调优参数有哪些？</li>
+<li>内存快照如何抓取，怎么分析Dump下来的文件？</li>
+<li>谈谈JVM中类加载器你的认识？？</li>
+</ul>
+<h1 id="1-JVM的位置"><a href="#1-JVM的位置" class="headerlink" title="1.JVM的位置"></a>1.JVM的位置</h1><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030720.png" alt="image-20200928222317385"></p>
+<h1 id="2-JVM的体系结构"><a href="#2-JVM的体系结构" class="headerlink" title="2.JVM的体系结构"></a>2.JVM的体系结构</h1><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030007.png" alt="image-20200928223316227"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030469.png" alt="image-20200928223420244"></p>
+<p>很多的第三方插件都是在执行引擎那一块加上的，其他的基本动不了</p>
+<h1 id="3-类加载器"><a href="#3-类加载器" class="headerlink" title="3.类加载器"></a>3.类加载器</h1><p>作用：</p>
+<ul>
+<li>加载class文件  new Student();   引用放在javaStack，但是具体的实例是放在堆里面的</li>
+</ul>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030321.png" alt="image-20200928225337081"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030341.png" alt="image-20200928225406065"></p>
+<p>1.虚拟机自带的加载器</p>
+<p>2.启动类（根）加载器</p>
+<p>3.扩展类加载器</p>
+<p>4.应用程序加载器</p>
+<p>5.双亲委派机制</p>
+<h1 id="4-双亲委派机制"><a href="#4-双亲委派机制" class="headerlink" title="4.双亲委派机制"></a>4.双亲委派机制</h1><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030838.png" alt="image-20200929221021289"></p>
+<h2 id="沙箱安全机制"><a href="#沙箱安全机制" class="headerlink" title="沙箱安全机制"></a>沙箱安全机制</h2><p>Java安全模型的核心就是沙箱（sandbox），什么是沙箱？沙箱是一个限制程序运行的环境，沙箱机制就是将java代码限定在虚拟机（JVM）特定的运行范围中，并且严格限制代码对本地系统资源访问，通过这样的措施来保证对代码的有效隔离，组织对本地系统造成破坏。沙箱<strong>主要限制系统资源访问</strong>，系统资源包括： CPU、内存、系统文件、网络。不同级别的沙箱对这些资源访问的限制也可以不一样</p>
+<p>所有的java程序都可以指定沙箱，可以定制安全策略。</p>
+<p>在java中将执行程序分为本地代码和远程代码两种，本地代码默认视为可信任的，而远程代码则被看作是不受信任的。对于授信的本地代码可以访问一切本地资源。而对于非授信的远程代码在早期的java实现中，安全依赖于沙箱机制。如下图所示JDK1.0安全模型。</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030200.png" alt="image-20201008010926332"></p>
+<p>但如此严格的机制也给程序的功能带来障碍，比如用户希望远程代码访问本地系统的时候，就无法实现。因此在后续的java1.1版本中，针对安全机制做了改进，增加了<strong>安全策略</strong>，允许用户指定代码对本地资源的访问权限。如下图所示JDK1.1安全模型</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/jvm%E5%AD%A6%E4%B9%A0.assets/image-20201008011215334.png" alt="image-20201008011215334"></p>
+<p>在java1.2版本中，再次改进了安全机制，增加<strong>代码签名</strong>，不论本地代码或者是远程代码，都会按照用户的安全策略设定，由类记载器加载到虚拟机中权限不同的运行空间，来实现差异化的代码执行权限控制。如下图所示JDK1.2安全模型</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030306.png" alt="image-20201008011458574"></p>
+<p>当前最新的安全机制实现，则引入了域（Domain）的概念。虚拟机会把所有代码加载到不同的系统域和应用域，系统域部分专门负责与关键资源进行交互，而各个应用域部分则通过系统域的部分代理来对各种需要的资源进行访问，虚拟机中不同的受保护域（Protected Domain），对应不一样的权限（Permission）。存在于不同域中的类文件就具有了当前域的全部权限，如图所示最新的安全模型。</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030851.png" alt="image-20201008111455910"></p>
+<p>组成沙箱的基本组件：</p>
+<ul>
+<li><p><code>字节码校验器</code>（bytecode verifier）：确保Java类文件遵循Java语言规范。这样可以帮助Java程序实现内存保护。但并不是所有的类文件都会经过字节码校验，比如核心类。  java   javax</p>
+</li>
+<li><p><code>类装载器</code>（class loader）：其中类装载器在3个方面对Java沙箱起作用</p>
+<ul>
+<li><p>它防止恶意代码去干涉善意的代码；   &#x2F;&#x2F;双亲委派机制</p>
+</li>
+<li><p>它守护了被信任的类库边界；</p>
+</li>
+<li><p>它将代码归入保护域，确定了代码可以进行哪些操作。3</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>虚拟机为不同的类加载器载入的类提供不同的命名空间，命名空间由一些列唯一的名称组成，每一个被装载的类有一个名字，这个命名空间是由java虚拟机为每一个类装载器维护的，他们互相之间甚至是不可见的。</p>
+<p>类装载器采用的机制是双亲委派模式。</p>
+<ol>
+<li>从内层JVM自带的类加载器开始加载，外层恶意同名类得不到加载进而无法使用；</li>
+<li>由于严格的通过包来区分访问域，，外层恶意的类通过内置代码也无法获得权限访问到内层类，破坏代码就自然无法生效</li>
+</ol>
+<ul>
+<li>存取控制： 存取控制器可以控制核心API对操作系统的存取权限，而这个控制策略的设定可以由用户控制</li>
+<li>安全管理器： 是核心API和操作系统之间的主要接口，实现权限控制，比存取控制器优先级别高</li>
+<li>安全软件包： java.security下的类和扩展包下的类，允许用户为自己的应用增加新的安全特性，包括：<ul>
+<li>安全提供者</li>
+<li>消息摘要</li>
+<li>数字签名    keytools  https  生成一个安全证书  https通过java实现</li>
+<li>加密</li>
+<li>鉴别</li>
+</ul>
+</li>
+</ul>
+<h1 id="6-Native"><a href="#6-Native" class="headerlink" title="6.Native"></a>6.Native</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> Native;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">        &#125; , <span class="string">&quot;my thread name&quot;</span>).start();</span><br><span class="line">        <span class="comment">//凡是带了native关键字的，说明了java的作用范围打不到了，会去调用底层的c语言的库</span></span><br><span class="line">        <span class="comment">//会进入本地方法栈 ， 调用本地方法接口   java  native interface</span></span><br><span class="line">        <span class="comment">//JNI的作用就是为了扩展java的使用融合不同的编程语言为java所用   最初就是为了融合c和c++</span></span><br><span class="line">        <span class="comment">// java诞生的时候  c 和 c ++  横行，必须要用调用c和c++的程序</span></span><br><span class="line">        <span class="comment">// 在内存中专门开辟了一块标记区域： native method stack  登记native方法</span></span><br><span class="line">        <span class="comment">//在最终执行的时候，加载本地方法库中的方法  通过jni</span></span><br><span class="line">        <span class="comment">//private native void start0();  就是一个单纯的class</span></span><br><span class="line">        <span class="comment">//java程序驱动打印机，  java去管理系统  robot 写外挂 在企业级应用中较为少见</span></span><br><span class="line">        <span class="comment">//调用其他接口：  Socket webService  http</span></span><br><span class="line">        <span class="comment">//  写其他的东西  通过socket来进行调用</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030977.png" alt="image-20201019225751068"></p>
+<h1 id="7-pc寄存器"><a href="#7-pc寄存器" class="headerlink" title="7.pc寄存器"></a>7.pc寄存器</h1><p>程序技术器： programe counter register</p>
+<p>每个线程都有一个程序计数器，是线程私有的，就是一个指针，指向方法区中的方法字节码（用来存储执行一条指令的地址，也是即将要执行的指令代码），在执行引擎读取下一条指令，是一个非常小的内存空间，几乎可以忽略不计</p>
+<h1 id="8-方法区"><a href="#8-方法区" class="headerlink" title="8.方法区"></a>8.方法区</h1><p>Method Area 方法区</p>
+<p>方法区是被所有的线程共享的，所有的字段和方法字节码，以及一些特殊方法，如构造函数，接口代码也在此定义，简单说，所有定义的方法的信息都保存在该区域中，<strong>此区域属于共享空间</strong></p>
+<p><strong>静态变量、常量、类信息（构造方法和接口定义），运行时的常量池存在方法区中，但是实例变量存在堆内存中，和方法区无关</strong>   static  final  Class  常量池</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> Native;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo01</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> a;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Demo01</span> <span class="variable">demo01</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Demo01</span>();</span><br><span class="line">        demo01.a=<span class="number">1</span>;</span><br><span class="line">        demo01.name=<span class="string">&quot;113&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030175.png" alt="image-20201019230931260"></p>
+<h1 id="9-栈"><a href="#9-栈" class="headerlink" title="9.栈"></a>9.栈</h1><p>一种数据结构 ， 一般和队列做比较  程序 &#x3D; 数据结构 + 算法   程序 &#x3D; 框架 + 业务逻辑  淘汰  SSM  SSH  SpringBoot  SpringCloud</p>
+<p>栈： 新进后出  后进先出  类似于一个桶.</p>
+<p>队列： 先进先出（FIFO）</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030948.png" alt="image-20201019231732382"></p>
+<p>为什么main先执行后结束</p>
+<p>把mai方法丢进栈里面，然后依次进入往上压入的方法，一旦main方法结束，就相当于是整个程序结束了，栈溢出就是一些方法相互调用，然后如果特别多的话就会溢出</p>
+<p>栈： 栈内存，主管程序的运行，生命周期和线程同步，线程结束我们的栈内存就会释放，对于栈来说，不存在垃圾回收问题，一旦线程结束，栈就会结束。</p>
+<p>栈： 8大基本类型，对象的引用 实例的方法</p>
+<p>栈运行原理： 栈帧</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030707.png" alt="image-20201020074941603"></p>
+<p>程序正在执行的方法，一定是在栈的顶部，直到栈的东西都弹出来</p>
+<p>栈+堆+方法区的一些关系：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030299.png" alt="image-20201020075557069"></p>
+<p>对象实例化的过程</p>
+<h1 id="10-三种JVM"><a href="#10-三种JVM" class="headerlink" title="10.三种JVM"></a>10.三种JVM</h1><ul>
+<li><p>sun公司  HotSpot</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030373.png" alt="image-20201020075811116"></p>
+</li>
+<li><p>BEA公司的  JRockit</p>
+</li>
+<li><p>IBM的j9vm  JIT编译器</p>
+</li>
+</ul>
+<p>我们学习的都是hotspot的</p>
+<h1 id="11-堆（重点）"><a href="#11-堆（重点）" class="headerlink" title="11.堆（重点）"></a>11.堆（重点）</h1><p>Heap，一个JVM只有一个堆内存，堆内存的大小是可以调节的。类加载器读取了文件之后，一般把啥东西放入堆中？ 类 方法 常量 变量，保存我们所有引用类型的真实对象</p>
+<p>堆内存中还要分为三个内存：  </p>
+<ul>
+<li>新生区</li>
+<li>养老区</li>
+<li>永久区</li>
+</ul>
+<p><strong><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112030631.png" alt="image-20201020081050943"></strong></p>
+<p>GC垃圾回收主要在伊甸园和养老区</p>
+<p>假设内存满了，就是oom，堆内存不够   java.lang.OutOfMemoryError: Java heap space</p>
+<p>在8之后，永久存储区改了个名字，叫元空间</p>
+<h1 id="12-新生区老年区"><a href="#12-新生区老年区" class="headerlink" title="12.新生区老年区"></a>12.新生区老年区</h1><p><strong>新生区</strong></p>
+<ul>
+<li>类： 诞生和成长的地方，甚至是死亡</li>
+<li>伊甸园区： 所有的对象都时在伊甸园区中创建的</li>
+<li>幸存者（0,1）</li>
+</ul>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031616.png" alt="image-20201020162638554"></p>
+<p>真理： 经过研究，99%的对象都是临时对象，进入养老区的并不是很多</p>
+<h1 id="13-永久区"><a href="#13-永久区" class="headerlink" title="13.永久区"></a>13.永久区</h1><p>这个区域是常驻内存的，用来存放jdk自身携带的class对象。interface元数据， 存储的是java运行时的一些环境或者是类信息，这个区域不存在垃圾回收，在关闭虚拟机的时候回释放这个区域的内存</p>
+<p>一个启动类，加载了大量的第三方jar包   一个tomcat部署了太多的应用   或者是大量动态生成的反射类 ， 如果这些类进行不断的加载，就可能放不下，知道内存满，就会出现OOM</p>
+<ul>
+<li>jdk1.6之前   ： 永久代  常量池是在方法区</li>
+<li>jdk1.7  ： 永久代  但是慢慢退化了  去永久代  这个时候常量池是在堆中</li>
+<li>jdk1.8之后  ：  无永久代，变成了元空间   常量池在元空间</li>
+</ul>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031411.png" alt="image-20201020165050751"></p>
+<p>现在的模型：</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031584.png" alt="image-20201020165253059"></p>
+<h1 id="14-堆内存调优"><a href="#14-堆内存调优" class="headerlink" title="14.堆内存调优"></a>14.堆内存调优</h1><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031738.png" alt="image-20201020181037948"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">maxMemory:981.5</span><br><span class="line">totalMemory:981.5</span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 305664K, used 20971K [0x00000000eab00000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 262144K, 8% used [0x00000000eab00000,0x00000000ebf7afb8,0x00000000fab00000)</span><br><span class="line">  from space 43520K, 0% used [0x00000000fd580000,0x00000000fd580000,0x0000000100000000)</span><br><span class="line">  to   space 43520K, 0% used [0x00000000fab00000,0x00000000fab00000,0x00000000fd580000)</span><br><span class="line"> ParOldGen       total 699392K, used 0K [0x00000000c0000000, 0x00000000eab00000, 0x00000000eab00000)</span><br><span class="line">  object space 699392K, 0% used [0x00000000c0000000,0x00000000c0000000,0x00000000eab00000)</span><br><span class="line"> Metaspace       used 3243K, capacity 4496K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 351K, capacity 388K, committed 512K, reserved 1048576K</span><br><span class="line"></span><br><span class="line">Process finished with <span class="built_in">exit</span> code 0</span><br><span class="line"></span><br><span class="line"><span class="comment">#  Metaspace 元空间  构思里面存在，但是在物理区域的时候没有这个</span></span><br><span class="line"><span class="comment">#  PSYoungGen  +  ParOldGen = 1005056k  =  981.5   =  totalMemory</span></span><br><span class="line"><span class="comment"># -Xms1024m -Xmx1024m -XX:+PrintGCDetails</span></span><br><span class="line"><span class="comment"># 把堆内存的空间调打，如果还不行，可能是代码有问题（专业工具）</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[GC (Allocation Failure) [PSYoungGen: 1536K-&gt;504K(2048K)] 1536K-&gt;687K(7680K), 0.0026000 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 1980K-&gt;503K(2048K)] 2164K-&gt;867K(7680K), 0.0014383 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 1762K-&gt;408K(2048K)] 2126K-&gt;1219K(7680K), 0.0012731 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 1779K-&gt;424K(2048K)] 2591K-&gt;2130K(7680K), 0.0012355 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[Full GC (Ergonomics) [PSYoungGen: 1341K-&gt;0K(2048K)] [ParOldGen: 5287K-&gt;1527K(5632K)] 6629K-&gt;1527K(7680K), [Metaspace: 3231K-&gt;3231K(1056768K)], 0.0052460 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 951K-&gt;0K(2048K)] 4268K-&gt;3317K(7680K), 0.0006889 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 0K-&gt;0K(2048K)] 3317K-&gt;3317K(7680K), 0.0003715 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[Full GC (Allocation Failure) [PSYoungGen: 0K-&gt;0K(2048K)] [ParOldGen: 3317K-&gt;3316K(5632K)] 3317K-&gt;3316K(7680K), [Metaspace: 3231K-&gt;3231K(1056768K)], 0.0057998 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 0K-&gt;0K(2048K)] 3316K-&gt;3316K(7680K), 0.0002574 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">[Full GC (Allocation Failure) [PSYoungGen: 0K-&gt;0K(2048K)] [ParOldGen: 3316K-&gt;3296K(5632K)] 3316K-&gt;3296K(7680K), [Metaspace: 3231K-&gt;3231K(1056768K)], 0.0070062 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 2048K, used 42K [0x00000000ffd80000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 1536K, 2% used [0x00000000ffd80000,0x00000000ffd8abc8,0x00000000fff00000)</span><br><span class="line">  from space 512K, 0% used [0x00000000fff00000,0x00000000fff00000,0x00000000fff80000)</span><br><span class="line">  to   space 512K, 0% used [0x00000000fff80000,0x00000000fff80000,0x0000000100000000)</span><br><span class="line"> ParOldGen       total 5632K, used 3296K [0x00000000ff800000, 0x00000000ffd80000, 0x00000000ffd80000)</span><br><span class="line">  object space 5632K, 58% used [0x00000000ff800000,0x00000000ffb38338,0x00000000ffd80000)</span><br><span class="line"> Metaspace       used 3263K, capacity 4496K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 353K, capacity 388K, committed 512K, reserved 1048576K</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">&quot;main&quot;</span> java.lang.OutOfMemoryError: Java heap space</span><br><span class="line">	at java.util.Arrays.copyOf(Arrays.java:3332)</span><br><span class="line">	at java.lang.AbstractStringBuilder.ensureCapacityInternal(AbstractStringBuilder.java:124)</span><br><span class="line">	at java.lang.AbstractStringBuilder.append(AbstractStringBuilder.java:674)</span><br><span class="line">	at java.lang.StringBuilder.append(StringBuilder.java:208)</span><br><span class="line">	at Native.Demo01.main(Demo01.java:12)</span><br><span class="line"></span><br><span class="line">Process finished with <span class="built_in">exit</span> code 1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 当GC清理不了的时候才会进行报错 ， 是oom的错误</span></span><br></pre></td></tr></table></figure>
+
+<p>在一个线程中突然出现了一个oom故障，该如何排除 ， 研究为什么出错？ </p>
+<ul>
+<li>能够看到代码的第几行出错？  ： 内存快照分析工具   MAT（eclipse），Jprofile（IDEA的）</li>
+<li>Debug一行一行分析代码</li>
+</ul>
+<p>MAT（eclipse），Jprofile（IDEA的）作用： </p>
+<ul>
+<li>分析Dump内存文件 ，快速定位内存泄露</li>
+<li>获得堆中的数据</li>
+<li>获得大的对象</li>
+<li>…..</li>
+</ul>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031147.png" alt="image-20201020190733275"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031226.png" alt="image-20201020190906962"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -Xmx1m  最小的内存  1/64</span></span><br><span class="line"><span class="comment"># -Xmx8m  最大的内存  1/4</span></span><br><span class="line"><span class="comment"># -XX:+HeapDumpOnOutOfMemoeyError  打印OOM的信息  </span></span><br><span class="line"><span class="comment"># -XX:+PrintGCDetails  打印GC来及回收信息</span></span><br><span class="line">-Xmx1m -Xmx8m -XX:+HeapDumpOnOutOfMemoeyError</span><br><span class="line"><span class="comment">#  要找其他的错误，只需要把后面的改了就行了</span></span><br></pre></td></tr></table></figure>
+
+<p>这种方式不知道第几行出问题了</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031431.png" alt="image-20201020191146376"></p>
+<h1 id="15-GC垃圾回收"><a href="#15-GC垃圾回收" class="headerlink" title="15.GC垃圾回收"></a>15.GC垃圾回收</h1><p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031509.png" alt="image-20201020191759879"></p>
+<p>JVM在进行垃圾回收的时候，并不是对这三个区域进行统一的回收，大部分的时候的回收都是在新生代</p>
+<ul>
+<li>新生代</li>
+<li>幸存区（form to ）</li>
+<li>老年区</li>
+</ul>
+<p>GC两种类型：</p>
+<ul>
+<li>轻GC  普通的GC  只针对新生代 ， 偶尔去轻幸存区</li>
+<li>重GC  全局的GC  老年区</li>
+</ul>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031983.png" alt="image-20201020192210141"></p>
+<p>JVM的内存模行和分区： 详细到每个区放什么</p>
+<p>堆里面的分区有哪些  ：  eden  from  to old  说说他们的特点</p>
+<p>GC的算法有哪些：  1. 标记清除法  2. 标记整理（标记压缩）   3. 复制算法  4. 引用计数法</p>
+<p>普通GC和重GC分别在什么时候发生</p>
+<p><strong>引用计数法：</strong></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031101.png" alt="image-20201020192759156"></p>
+<p><strong>复制算法：</strong></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031332.png" alt="image-20201020194055040"></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031188.png" alt="image-20201020194637459"></p>
+<ul>
+<li>好处： 没有内存的碎片</li>
+<li>坏处： 浪费了内存空间  多了一半内存空间永远是空  to  假设对象是100%存活（极端情况的时候回被放大）</li>
+</ul>
+<p>复制算法最佳使用场景是对象存活度较低的情况： 新生区</p>
+<p><strong>标记清除算法：</strong></p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031328.png" alt="image-20201020195212651"></p>
+<ul>
+<li>缺点： 两次扫描 ， 严重浪费时间，会产生内存碎片</li>
+<li>优点： 不需要额外的空间</li>
+</ul>
+<p><strong>标记压缩：</strong></p>
+<p>是对于标记清除的再优化</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031859.png" alt="image-20201020195523183"></p>
+<p>总结：</p>
+<p>内存效率：  复制算法》标记清除算法》标记压缩（时间复杂度）</p>
+<p>内存整齐度：复制算法》标记压缩》标记清除算法</p>
+<p>内存利用率：标记压缩》标记清除算法》复制算法</p>
+<p>思考： 难道没有最优的算法吗？   没有最优的算法来进行调优，只有最合适的    GC： 分代收集算法</p>
+<p><strong>年轻代：</strong></p>
+<ul>
+<li>存活率低</li>
+<li>复制算法</li>
+</ul>
+<p><strong>老年代：</strong></p>
+<ul>
+<li>区域大，存活率高</li>
+<li>标记清除（内存碎片不是太多）+标记压缩混合实现</li>
+</ul>
+<p>一天学JVM，不现实，要深究，必须花时间学习，多看面试题</p>
+<h1 id="16-JMM-java-memory-model"><a href="#16-JMM-java-memory-model" class="headerlink" title="16.JMM   java memory model"></a>16.JMM   java memory model</h1><ol>
+<li><p>什么是JMM</p>
+<p>【JMM】（Java Memory Model的缩写）允许编译器和缓存以数据在处理器特定的缓存（或寄存器）和主存之间移动的次序拥有重要的特权，除非<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%A8%8B%E5%BA%8F%E5%91%98/62748">程序员</a>使用了volatile或<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/synchronized/8483356">synchronized</a>明确请求了某些可见性的保证。</p>
+</li>
+<li><p>他是干啥的</p>
+<p>官方   博客   对应的视频</p>
+<p>作用：<strong>缓存一致性协议，用于定义数据读写的规则。</strong></p>
+<p>JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存（Main Memory）中，每个线程都有一个私有的本地内存（Local Memory）</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112031726.png" alt="image-20201020201546376"></p>
+<p>解决共享对象可见性这个问题，我们可以使用java volatile关键字或者是加锁</p>
+</li>
+<li><p>他如何学习</p>
+<p>JMM是一个抽象的概念</p>
+<p>volatile</p>
+<p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://raw.githubusercontent.com/timoustop/PicGoSave/main/2026/typora/202601112032750.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">lock（锁定）：作用于主内存的变量，它把一个变量标识为一条线程独占的状态。</span><br><span class="line"></span><br><span class="line">unlock（解锁）：作用于主内存的变量，它把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</span><br><span class="line"></span><br><span class="line">read（读取）：作用于主内存的变量，它把一个变量的值从主内存传输到线程的工作内存中，以便随后的load动作使用。</span><br><span class="line"></span><br><span class="line">load（载入）：作用于工作内存的变量，它把read操作从主内存中得到的变量值放入工作内存的变量副本中。</span><br><span class="line"></span><br><span class="line">use（使用）：作用于工作内存的变量，它把工作内存中一个变量的值传递给执行引擎，每当虚拟机遇到一个需要使用到变量的值的字节码指令时将会执行这个操作。</span><br><span class="line"></span><br><span class="line">assign（赋值）：作用于工作内存的变量，它把一个从执行引擎接收到的值赋给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</span><br><span class="line"></span><br><span class="line">store（存储）：作用于工作内存的变量，它把工作内存中一个变量的值传送到主内存中，以便随后的write操作使用。</span><br><span class="line"></span><br><span class="line">write（写入）：作用于主内存的变量，它把store操作从工作内存中得到的变量的值放入主内存的变量中。</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="17-总结"><a href="#17-总结" class="headerlink" title="17.总结"></a>17.总结</h1><p>1.百度</p>
+<p>2.思维导图</p>
+
+<div class="article-footer fs14">
+    <section id="license">
+      <div class="header"><span>授權條款</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    </div>
+</article>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">較新文章</div><a href="/2022/01/11/git%E5%AD%A6%E4%B9%A0/">git学习</a></div><div class="item" id="next"><div class="note">較早文章</div><a href="/2022/01/08/docker%E5%AD%A6%E4%B9%A0/">docker学习</a></div></section></div>
+
+
+
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><p>本站由 <a href="/">timous</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.28.0">Stellar 1.28.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目錄</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM%E6%8E%A2%E7%A9%B6"><span class="toc-text">JVM探究</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-JVM%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-text">1.JVM的位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-JVM%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="toc-text">2.JVM的体系结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="toc-text">3.类加载器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="toc-text">4.双亲委派机制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B2%99%E7%AE%B1%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6"><span class="toc-text">沙箱安全机制</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Native"><span class="toc-text">6.Native</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-pc%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">7.pc寄存器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-text">8.方法区</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E6%A0%88"><span class="toc-text">9.栈</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E4%B8%89%E7%A7%8DJVM"><span class="toc-text">10.三种JVM</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E5%A0%86%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="toc-text">11.堆（重点）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-%E6%96%B0%E7%94%9F%E5%8C%BA%E8%80%81%E5%B9%B4%E5%8C%BA"><span class="toc-text">12.新生区老年区</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-%E6%B0%B8%E4%B9%85%E5%8C%BA"><span class="toc-text">13.永久区</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#14-%E5%A0%86%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98"><span class="toc-text">14.堆内存调优</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#15-GC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6"><span class="toc-text">15.GC垃圾回收</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#16-JMM-java-memory-model"><span class="toc-text">16.JMM   java memory model</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#17-%E6%80%BB%E7%BB%93"><span class="toc-text">17.总结</span></a></li></ol></div><div class="widget-footer">
+
+<a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/></g></svg><span>回到頂部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M10.46 1.25h3.08c1.603 0 2.86 0 3.864.095c1.023.098 1.861.3 2.6.752a5.75 5.75 0 0 1 1.899 1.899c.452.738.654 1.577.752 2.6c.095 1.004.095 2.261.095 3.865v1.067c0 1.141 0 2.036-.05 2.759c-.05.735-.153 1.347-.388 1.913a5.75 5.75 0 0 1-3.112 3.112c-.805.334-1.721.408-2.977.43a10.81 10.81 0 0 0-.929.036c-.198.022-.275.054-.32.08c-.047.028-.112.078-.224.232c-.121.166-.258.396-.476.764l-.542.916c-.773 1.307-2.69 1.307-3.464 0l-.542-.916a10.605 10.605 0 0 0-.476-.764c-.112-.154-.177-.204-.224-.232c-.045-.026-.122-.058-.32-.08c-.212-.023-.49-.03-.93-.037c-1.255-.021-2.171-.095-2.976-.429A5.75 5.75 0 0 1 1.688 16.2c-.235-.566-.338-1.178-.389-1.913c-.049-.723-.049-1.618-.049-2.76v-1.066c0-1.604 0-2.86.095-3.865c.098-1.023.3-1.862.752-2.6a5.75 5.75 0 0 1 1.899-1.899c.738-.452 1.577-.654 2.6-.752C7.6 1.25 8.857 1.25 10.461 1.25M6.739 2.839c-.914.087-1.495.253-1.959.537A4.25 4.25 0 0 0 3.376 4.78c-.284.464-.45 1.045-.537 1.96c-.088.924-.089 2.11-.089 3.761v1c0 1.175 0 2.019.046 2.685c.045.659.131 1.089.278 1.441a4.25 4.25 0 0 0 2.3 2.3c.515.214 1.173.294 2.429.316h.031c.398.007.747.013 1.037.045c.311.035.616.104.909.274c.29.17.5.395.682.645c.169.232.342.525.538.856l.559.944a.52.52 0 0 0 .882 0l.559-.944c.196-.331.37-.624.538-.856c.182-.25.392-.476.682-.645c.293-.17.598-.24.909-.274c.29-.032.639-.038 1.037-.045h.032c1.255-.022 1.913-.102 2.428-.316a4.25 4.25 0 0 0 2.3-2.3c.147-.352.233-.782.278-1.441c.046-.666.046-1.51.046-2.685v-1c0-1.651 0-2.837-.089-3.762c-.087-.914-.253-1.495-.537-1.959a4.25 4.25 0 0 0-1.403-1.403c-.464-.284-1.045-.45-1.96-.537c-.924-.088-2.11-.089-3.761-.089h-3c-1.651 0-2.837 0-3.762.089" clip-rule="evenodd"/><path fill="currentColor" d="M9 11a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><span>參與討論</span></a></div></widget>
+</div></aside><div class='float-panel blur'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+<script type="text/javascript">
+  const ctx = {
+    date_suffix: {
+      just: `剛剛`,
+      min: `分鐘前`,
+      hour: `小時前`,
+      day: `天前`,
+    },
+    root : `/`,
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+  };
+  const deps = {
+    jquery: `https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js`,
+    marked: `https://cdn.bootcdn.net/ajax/libs/marked/4.0.18/marked.min.js`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')){
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+    
+    onLoading: (el) => {
+      if (el) {
+        $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      let retryTimes = 3;
+      utils.onLoading(el);
+      function req() {
+        return new Promise((resolve, reject) => {
+          let status = 0; // 0 等待 1 完成 2 超时
+          let timer = setTimeout(() => {
+            if (status === 0) {
+              status = 2;
+              timer = null;
+              reject('请求超时');
+              if (retryTimes == 0) {
+                onFailure();
+              }
+            }
+          }, 5000);
+          fetch(url).then(function(response) {
+            if (status !== 2) {
+              clearTimeout(timer);
+              resolve(response);
+              timer = null;
+              status = 1;
+            }
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          }).then(function(data) {
+            retryTimes = 0;
+            utils.onLoadSuccess(el);
+            callback(data);
+          }).catch(function(error) {
+            if (retryTimes > 0) {
+              retryTimes -= 1;
+              setTimeout(() => {
+                req();
+              }, 5000);
+            } else {
+              utils.onLoadFailure(el);
+              onFailure();
+            }
+          });
+        });
+      }
+      req();
+    },
+  };
+</script>
+
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.28.0" async></script>
+
+<!-- optional -->
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.bootcdn.net/ajax/libs/flying-pages/2.1.2/flying-pages.min.js"></script><script defer src="https://cdn.bootcdn.net/ajax/libs/vanilla-lazyload/17.8.4/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+</script><script>
+  ctx.fancybox = {
+    selector: `.timenode p>img`,
+    css: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.min.css`,
+    js: `https://cdn.bootcdn.net/ajax/libs/fancyapps-ui/5.0.22/fancybox/fancybox.umd.min.js`
+  };
+  var selector = '[data-fancybox]:not(.error)';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const els = document.getElementsByClassName('ds-memos');
+    if (els != undefined && els.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || null
+        }
+      });
+    })
+  }
+</script><script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>
